@@ -12,6 +12,8 @@ import com.squareup.workflow.ui.ViewRegistry
  */
 class MainApplication : Application() {
 
+    val eventsPackage = WorkflowEventsPackage()
+
     val containerHints by lazy {
         ContainerHints(ViewRegistry(ReactNativeViewBinding(instanceManager)))
     }
@@ -22,6 +24,7 @@ class MainApplication : Application() {
             .setBundleAssetName("index.android.bundle")
             .setJSMainModulePath("index")
             .addPackage(MainReactPackage())
+            .addPackage(eventsPackage)
             .setUseDeveloperSupport(BuildConfig.DEBUG)
             .setInitialLifecycleState(LifecycleState.BEFORE_CREATE)
             .build()

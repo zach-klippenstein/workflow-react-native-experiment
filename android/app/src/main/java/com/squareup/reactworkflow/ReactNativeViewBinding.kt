@@ -9,6 +9,8 @@ import com.facebook.react.ReactRootView
 import com.squareup.workflow.ui.ContainerHints
 import com.squareup.workflow.ui.ViewBinding
 import com.squareup.workflow.ui.bindShowRendering
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlin.reflect.KClass
 
 /**
@@ -33,18 +35,39 @@ class ReactNativeViewBinding(
             initialRendering.moduleName,
             initialRendering.props.updateHints(initialContainerHints)
         )
+        var eventHandlers = initialRendering.eventHandlers
+
+        // Propagate workflow updates.
         rootView.bindShowRendering(initialRendering, initialContainerHints) { rendering, hints ->
             rootView.appProperties = rendering.props.updateHints(hints)
+            eventHandlers = rendering.eventHandlers
         }
+
+        // Wire up lifecycle events.
+        val reactScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
         rootView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
                 // Noop
             }
 
             override fun onViewDetachedFromWindow(v: View) {
+                reactScope.cancel()
                 rootView.unmountReactApplication()
             }
         })
+
+        // Wire up UI events.
+        val eventsPackage =
+            rootView.reactInstanceManager!!.packages.filterIsInstance<WorkflowEventsPackage>()
+                .single()
+        reactScope.launch {
+            eventsPackage.events.collect { (name, params) ->
+                eventHandlers[name]?.invoke(params) ?: run {
+                    println("Warning: React Native sent workflow event but no handler found: $name($params)")
+                }
+            }
+        }
+
         return rootView
     }
 

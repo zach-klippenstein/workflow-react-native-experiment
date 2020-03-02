@@ -18,11 +18,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         SoLoader.init(this, false)
         println(instanceManager)
-//        val initialProps = Bundle().also {
-//            it.putString("name", "World")
-//        }
-//        rootView.startReactApplication(instanceManager, "MyReactNativeApp", initialProps)
-//        setContentView(rootView)
         setContentWorkflow(containerHints) {
             WorkflowRunner.Config(
                 MainWorkflow(),

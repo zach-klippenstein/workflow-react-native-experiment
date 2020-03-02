@@ -8,7 +8,8 @@ import com.squareup.workflow.ui.Compatible
  */
 data class ReactNativeRendering(
     val moduleName: String,
-    val props: Bundle
+    val props: Bundle,
+    val eventHandlers: Map<String, (params: Any?) -> Unit> = emptyMap()
 ) : Compatible {
     override val compatibilityKey: String get() = moduleName
 }

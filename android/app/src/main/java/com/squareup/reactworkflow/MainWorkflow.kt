@@ -33,7 +33,10 @@ class MainWorkflow : StatefulWorkflow<Unit, State, Nothing, ReactNativeRendering
 
         return ReactNativeRendering(
             moduleName = "MyReactNativeApp",
-            props = Bundle().apply { putString("name", state.name) }
+            props = Bundle().apply { putString("name", state.name) },
+            eventHandlers = mapOf(
+                "onClick" to { params: Any? -> context.actionSink.send(onClick(params)) }
+            )
         )
     }
 
@@ -42,4 +45,8 @@ class MainWorkflow : StatefulWorkflow<Unit, State, Nothing, ReactNativeRendering
 
 private fun setName(name: String) = action<State, Nothing> {
     nextState = State(name)
+}
+
+private fun onClick(params: Any?) = action<State, Nothing> {
+    nextState = State("${nextState.name} (clicked: $params)")
 }

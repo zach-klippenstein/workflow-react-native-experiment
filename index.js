@@ -1,11 +1,13 @@
 import React from 'react';
-import {AppRegistry, StyleSheet, Text, View} from 'react-native';
+import {AppRegistry, StyleSheet, Text, Button, View} from 'react-native';
+import {NativeModules} from 'react-native';
 
 class HelloWorld extends React.Component {
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.hello}>Hello, {this.props.name}</Text>
+        <Button title="Click me" onPress={() => NativeModules.WorkflowEvents.sendEvent("onClick", "bar")}>Click me</Button>
       </View>
     );
   }
